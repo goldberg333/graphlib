@@ -2,7 +2,7 @@ require 'matrix'
 
 class Vertice
   include Comparable
-  attr_accessor :value, :label
+  attr_accessor :value
 
   def initialize(value = nil)
     @value = value
@@ -45,9 +45,9 @@ class Edge
 end
 
 class Graph
-  attr_accessor :v, :e, :adj_list
+  attr_accessor :v, :e, :adj_list, :vlabels
   def initialize(v = [], g = [])
-    @v, @e, @adj_list = v, g, {}
+    @v, @e, @adj_list, @vlabels = v, g, {}, {}
     convert_to_adj_list
   end
 
@@ -78,15 +78,13 @@ class Graph
       result += "\n"
     end
     result
-  end
-  
-  
+  end  
 
   def bfs_label(vert)
     labled = []
     @adj_list[vert].each do |nachbar|
-      unless (nachbar.label)
-        nachbar.label = @next_label
+      unless (@vlabels[nachbar])
+        @vlabels[nachbar] = @next_label
         labled << nachbar
         @next_label += 1
       end
@@ -99,7 +97,8 @@ class Graph
   def bfs
     @next_label = 1
     first = @v.sort.first
-    first.label = @next_label
+    @vlabels = {}
+    @vlabels[first] = @next_label
     @next_label += 1
     bfs_label(first)
   end
@@ -163,12 +162,10 @@ require 'graphviz'
 graph = GraphViz.new('somegraph', :output => 'png', :file => 'graph.png', :type => 'graph')
 hash = {}
 g.v.each do |v|
-  hash[v] = graph.add_node(v.label.to_s)
-  puts v
+  hash[v] = graph.add_node(g.vlabels[v].to_s)
 end
 g.e.each do |e|
-  puts graph.add_edge(hash[e.v1],hash[e.v2])
-  puts e
+  graph.add_edge(hash[e.v1],hash[e.v2])
 end
 
 graph.output
