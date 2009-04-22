@@ -80,11 +80,16 @@ class Graph
     result
   end  
 
+  def label(vert,i=-1)
+    return @vlabels[vert][i] if i!=-1
+    return @vlabels[vert]
+  end
+
   def bfs_label(vert)
     labled = []
     @adj_list[vert].each do |nachbar|
       unless (@vlabels[nachbar])
-        @vlabels[nachbar] = @next_label
+        @vlabels[nachbar] = [@next_label]
         labled << nachbar
         @next_label += 1
       end
@@ -93,12 +98,12 @@ class Graph
       bfs_label(nachbar)
     end
   end
-  
+
   def bfs
-    @next_label = 1
+    @next_label = 0
     first = @v.sort.first
     @vlabels = {}
-    @vlabels[first] = @next_label
+    @vlabels[first] = [@next_label]
     @next_label += 1
     bfs_label(first)
   end
@@ -162,7 +167,7 @@ require 'graphviz'
 graph = GraphViz.new('somegraph', :output => 'png', :file => 'graph.png', :type => 'graph')
 hash = {}
 g.v.each do |v|
-  hash[v] = graph.add_node(g.vlabels[v].to_s)
+  hash[v] = graph.add_node(g.vlabels[v].join(''))
 end
 g.e.each do |e|
   graph.add_edge(hash[e.v1],hash[e.v2])
