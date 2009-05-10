@@ -22,33 +22,24 @@ class Graph
 
   #Show graph in adjacency list form
   def show_adj_list
-    result = ''
-    @adj_list.keys.sort.each do |key|
-      result += "#{key}: {#{@adj_list[key].join(',') if @adj_list[key]}}\n"
-    end
-    result
-    @adj_list.keys.inject("") {|sum,v| sum += "#{v}: {#{@adj_list[v].join(',') if @adj_list[v]}}\n"}
+    @adj_list.keys.inject("") {|sum,v| sum += "#{v}: {#{@adj_list[v].to_a.join(',') if @adj_list[v]}}\n"}
   end  
 
   #Breadth First Search subroutine
   def bfs_sub(to_vis,visited)
     #If there is no vertex to visit then we're done
-    if to_vis.empty?
-      return visited
-      #If no - then we have two ways to go
+    return visited if to_vis.empty?
+    #get next vertex to visit
+    vis = to_vis.deq
+    #if next vertex to visit is already visited then we can just skip it      
+    if visited.include?(vis)
+      bfs_sub(to_vis,visited)
     else
-      #get next vertex to visit
-      vis = to_vis.deq
-      #if next vertex to visit is already visited then we can just skip it      
-      if visited.include?(vis)
-        bfs_sub(to_vis,visited)
-      else
-        #add all neighbours to vertices to visit
-        @adj_list[vis].map {|vertex| to_vis.enq(vertex)}
-        #add currect vertex to visit to visited vertices list
-        visited << vis
-        bfs_sub(to_vis,visited)
-      end
+      #add all neighbours to vertices to visit
+      @adj_list[vis].map {|vertex| to_vis.enq(vertex)}
+      #add currect vertex to visit to visited vertices list
+      visited << vis
+      bfs_sub(to_vis,visited)
     end
   end
 
