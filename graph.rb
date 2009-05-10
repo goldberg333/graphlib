@@ -16,8 +16,8 @@ class Graph
 
   #Convert all vertices and edges into adjacency list
   def convert_to_adj_list
-    @edges.map {|edge| add_edge(edge)}
-    @vertices.map {|vertex| add_vertex(vertex)}
+    @edges.map {|edge| add_edge_to_adj_list(edge)}
+    @vertices.map {|vertex| add_vertex_to_adj_list(vertex)}
   end
 
   #Show graph in adjacency list form
@@ -70,12 +70,12 @@ class Graph
   end
 
   #Add vertex to adjacency list
-  def add_vertex(vertex)
+  def add_vertex_to_adj_list(vertex)
     @adj_list[vertex] = Set.new unless @adj_list[vertex]
   end
 
   #Add edge to adjacency list
-  def add_edge(edge)
+  def add_edge_to_adj_list(edge)
     @adj_list[edge.v1] << edge.v2 if @adj_list[edge.v1]
     @adj_list[edge.v1] = Set.new [edge.v2] unless @adj_list[edge.v1]
     unless directed
@@ -133,7 +133,7 @@ class Graph
       hash[v] = graph.add_node(v.to_s)
     end
     @edges.each do |e|
-      graph.add_edge(hash[e.v1],hash[e.v2])
+      graph.add_edge_to_adj_list(hash[e.v1],hash[e.v2])
     end
     graph.output
   end
