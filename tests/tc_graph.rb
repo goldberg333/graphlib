@@ -124,4 +124,14 @@ class TestGraph < Test::Unit::TestCase
     assert_equal(test, @graph.adj_list, "Adjacency list ins't correct for undirected graph!")
   end
 
+  def test_degree
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@e1]))
+    degr = graph.degree(@a)
+    assert_equal(1, degr, "Degree must be equal to 1")
+    graph.add_edge_to_adj_list(Edge.new(@a,@b))
+    assert_equal(degr, graph.degree(@a), "Degree shouldn't have been changed!")
+    graph.add_edge_to_adj_list(Edge.new(@a,@c))
+    assert_equal(degr + 1, graph.degree(@a),"Degree should have been incremented!")
+  end
+
 end

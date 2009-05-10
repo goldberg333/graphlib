@@ -84,11 +84,9 @@ class Graph
     end
   end
 
-  #Returns the degree of the given vertex
-  def deg(vertex)
-    res = 0
-    @edges.each {|edge| res += 1 if edge.v1 == vertex}
-    res
+  #Returns the degree of the given vertex for undirected graph
+  def degree(vertex)
+    @adj_list[vertex].size
   end
 
   #Returns cartesian product of this and given graphs
@@ -96,7 +94,7 @@ class Graph
     verts = []
     edges = []
     @vertices.each do |u|
-      graph.v.each do |v|
+      graph.vertices.each do |v|
         verts << [u,v]
       end
     end
