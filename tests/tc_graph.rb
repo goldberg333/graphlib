@@ -58,6 +58,47 @@ class TestGraph < Test::Unit::TestCase
     test_add_vertex_to_adj_list(true,z,false)
   end
 
+  def test_add_edge_to_adj_list(directed,existent)
+    if existent
+      edge = Edge.new(@a,@b)
+    else
+      edge = Edge.new(@c,@d)
+    end
+    graph = Graph.new(Set.new([@a,@b,@c,@d]),Set.new([@e1]),directed)
+    v1_neighbours_cnt = graph.adj_list[edge.v1].size
+    v2_neighbours_cnt = graph.adj_list[edge.v2].size
+    graph.add_edge_to_adj_list(edge)
+    if existent
+      assert_equal(v1_neighbours_cnt, graph.adj_list[edge.v1].size,"Neighbours count for the first vertex shouldn't have changed")
+      assert_equal(v2_neighbours_cnt, graph.adj_list[edge.v2].size,"Neighbours count for the second vertex shouldn't have changed")
+    end
+    if directed
+      assert_equal(v2_neighbours_cnt, graph.adj_list[edge.v2].size,"Some changes for second vertex!")
+      assert_equal(v1_neighbours_cnt + 1, graph.adj_list[edge.v1].size,"New neighbour hasn't been added!") unless existent
+    else
+      unless existent
+        assert_equal(v1_neighbours_cnt + 1, graph.adj_list[edge.v1].size,"New neighbour hasn't been added for the first vertex")
+        assert_equal(v2_neighbours_cnt + 1, graph.adj_list[edge.v2].size,"new neighbour hasn't been added for the second vertex")
+      end
+    end
+  end
+
+  def test_add_edge_to_adj_list_dir_graph_nonexistent_edge
+    test_add_edge_to_adj_list(true,false)
+  end
+
+  def test_add_edge_to_adj_list_undir_graph_nonexistent_edge
+    test_add_edge_to_adj_list(false,false)
+  end
+
+  def test_add_edge_to_adj_list_dir_graph_existent_edge
+    test_add_edge_to_adj_list(true,true)
+  end
+
+  def test_add_edge_to_adj_list_undir_graph_existent_edge
+    test_add_edge_to_adj_list(false,true)
+  end
+
   def test_convert_to_adjacency_list_for_directed_graph
     test = Hash.new
     test[@a] = Set.new [@b,@d,@h]
