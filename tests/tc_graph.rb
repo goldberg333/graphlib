@@ -25,7 +25,39 @@ class TestGraph < Test::Unit::TestCase
   def teardown
 
   end
+
+  def test_add_vertex_to_adj_list(directed,vertex,existent)
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@e1,@e4]),directed)
+    vertices_cnt = graph.adj_list.keys.size
+    neighbours_cnt = graph.adj_list[vertex].size if existent
+    assert_nil(graph.adj_list[vertex]) unless existent
+    graph.add_vertex_to_adj_list(vertex)
+    if existent
+      assert_equal(vertices_cnt, graph.adj_list.keys.size, "Wrong number of vertices in ajacency list!")
+      assert_equal(neighbours_cnt, graph.adj_list[vertex].size, "Wrong number of neighbours in adjacency list!")
+    else
+      assert_equal(vertices_cnt + 1, graph.adj_list.keys.size, "Vertex wasn't added!")
+    end
+  end
+
+  def test_add_vertex_to_adj_list_undir_graph_existent_vertex
+    test_add_vertex_to_adj_list(false,@a,true)
+  end
+
+  def test_add_vertex_to_adj_list_dir_graph_existent_vertex
+    test_add_vertex_to_adj_list(true,@a,true)
+  end
   
+  def test_add_vertex_to_adj_list_undir_graph_nonexistent_vertex
+    z = Vertex.new('z')
+    test_add_vertex_to_adj_list(false,z,false)
+  end
+
+  def test_add_vertex_to_adj_list_dir_graph_nonexistent_vertex
+    z = Vertex.new('z')
+    test_add_vertex_to_adj_list(true,z,false)
+  end
+
   def test_convert_to_adjacency_list_for_directed_graph
     test = Hash.new
     test[@a] = Set.new [@b,@d,@h]
