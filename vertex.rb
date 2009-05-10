@@ -6,6 +6,14 @@ class Vertex
     @value = value
   end
 
+  def eql? (vert2)
+    @value == vert2.value
+  end
+
+  def hash
+    @value.hash
+  end
+
   def <=> (vert2)
     @value <=> vert2.value
   end

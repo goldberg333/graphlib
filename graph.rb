@@ -1,4 +1,5 @@
 require 'matrix'
+require 'set'
 require 'thread'
 require 'vertex'
 require 'edge'
@@ -7,43 +8,44 @@ require 'graphviz'
 
 class Graph
   attr_accessor :vertices, :edges, :adj_list, :vlabels, :directed
-  def initialize(v = [], g = [], directed = false)
-    @vertices, @edges, @adj_list, @verticeslabels, @directed = v, g, {}, {}, directed
+  #Create new [un]directed graph using given vertices and edges between them
+  def initialize(v, g, directed = false)
+    @vertices, @edges, @adj_list, @verticeslabels, @directed = v.to_set, g.to_set, {}, {}, directed
     convert_to_adj_list
   end
 
-#Convert all vertices and edges into adjacency list
+  #Convert all vertices and edges into adjacency list
   def convert_to_adj_list
     @edges.map {|edge| add_edge(edge)}
     @vertices.map {|vertex| add_vertex(vertex)}
   end
 
-#Show graph in adjacency list form
+  #Show graph in adjacency list form
   def show_adj_list
     result = ''
     @adj_list.keys.sort.each do |key|
       result += "#{key}: {#{@adj_list[key].join(',') if @adj_list[key]}}\n"
     end
     result
-    @adj_list.inject() {|sum,v| sum += "#{key}: {#{@adj_list[key].join(',') if @adj_list[key]}}\n"}
+    @adj_list.keys.inject("") {|sum,v| sum += "#{v}: {#{@adj_list[v].join(',') if @adj_list[v]}}\n"}
   end  
 
-#Breadth First Search subroutine
+  #Breadth First Search subroutine
   def bfs_sub(to_vis,visited)
     #If there is no vertex to visit then we're done
     if to_vis.empty?
       return visited
-#If no - then we have two ways to go
+      #If no - then we have two ways to go
     else
-#get next vertex to visit
+      #get next vertex to visit
       vis = to_vis.deq
-#if next vertex to visit is already visited then we can just skip it      
+      #if next vertex to visit is already visited then we can just skip it      
       if visited.include?(vis)
         bfs_sub(to_vis,visited)
       else
-#add all neighbours to vertices to visit
+        #add all neighbours to vertices to visit
         @adj_list[vis].map {|vertex| to_vis.enq(vertex)}
-#add currect vertex to visit to visited vertices list
+        #add currect vertex to visit to visited vertices list
         visited << vis
         bfs_sub(to_vis,visited)
       end
@@ -62,6 +64,7 @@ class Graph
     bfs_sub(to_vis,[])
   end
 
+  #Check wheather graph contains cycles
   def contain_cycle(vertex)
     @marking = Hash.new
     if @marking[x] == 'in Bearbeitung'
@@ -75,25 +78,29 @@ class Graph
     end
   end
 
+  #Add vertex to adjacency list
   def add_vertex(vertex)
-    @adj_list[vertex] = nil unless @adj_list[vertex]
+    @adj_list[vertex] = Set.new unless @adj_list[vertex]
   end
 
+  #Add edge to adjacency list
   def add_edge(edge)
-    @adj_list[edge.v1] << edge.v2 if @adj_list[edge.v1] and not @adj_list[edge.v1].include?(edge.v2)
-    @adj_list[edge.v1] = [edge.v2] unless @adj_list[edge.v1]
-    if directed
-      @adj_list[edge.v2] << edge.v1 if @adj_list[edge.v2] and not @adj_list[edge.v2].include?(edge.v1)
-      @adj_list[edge.v2] = [edge.v1] unless @adj_list[edge.v2]
+    @adj_list[edge.v1] << edge.v2 if @adj_list[edge.v1]
+    @adj_list[edge.v1] = Set.new [edge.v2] unless @adj_list[edge.v1]
+    unless directed
+      @adj_list[edge.v2] << edge.v1 if @adj_list[edge.v2]
+      @adj_list[edge.v2] = Set.new [edge.v1] unless @adj_list[edge.v2]
     end
   end
 
-  def deg(vertice)
+  #Returns the degree of the given vertex
+  def deg(vertex)
     res = 0
-    @edges.each {|edge| res += 1 if edge.v1 == vertice}
+    @edges.each {|edge| res += 1 if edge.v1 == vertex}
     res
   end
 
+  #Returns cartesian product of this and given graphs
   def cartesian_product(graph)
     verts = []
     edges = []
@@ -127,6 +134,7 @@ class Graph
     "V = {#{@vertices.join(', ')}} G = {#{@edges.join(', ')}}"
   end
   
+  #Render current graph into file using given format (uses graphviz lib)
   def render_to(params = {:format => 'png', :file => "graph.#{params[:format]}"})
     graph = GraphViz.new('somegraph', :output => params[:format], :file => params[:file], :type => 'graph')
     hash = {}
