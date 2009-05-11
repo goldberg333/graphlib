@@ -72,6 +72,7 @@ class Graph
 
   #Add vertex to adjacency list
   def add_vertex_to_adj_list(vertex)
+    @vertices << vertex
     @adj_list[vertex] = Set.new unless @adj_list[vertex]
   end
 
@@ -99,8 +100,8 @@ class Graph
       end
     end
 
-    res.vertices.each do |v1|
-      res.vertices.each do |v2|
+    res.adj_list.keys.each do |v1|
+      res.adj_list.keys.each do |v2|
         u,v = v1.value.split(',').map{|obj| Vertex.new(obj)}
         ua,va = v2.value.split(',').map{|obj| Vertex.new(obj)}
         edge1 = Edge.new(u,ua)

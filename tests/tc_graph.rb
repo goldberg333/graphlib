@@ -168,7 +168,7 @@ class TestGraph < Test::Unit::TestCase
     graph2 = Graph.new(Set.new([v0,v1]),Set.new([e01]))
     res = graph1.cartesian_product(graph2)
     assert_equal(graph1.adj_list.keys.size * graph2.adj_list.keys.size, res.adj_list.keys.size, "Wrong number of vertices!")
-    assert_equal(29,res.vertices.inject(0) {|sum,val| sum += res.degree(val)}, "Wrong total degree!")
+    assert_equal(28,res.vertices.inject(0) {|sum,val| sum += res.degree(val)}, "Wrong total degree!")
   end
 
 end
