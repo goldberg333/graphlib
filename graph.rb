@@ -132,7 +132,7 @@ class Graph
     graph = GraphViz.new('somegraph', :output => params[:format], :file => params[:file], :type => directed ? 'digraph' : 'graph')
     nodes = {}
     @vertices.each do |v|
-      nodes[v] = graph.add_node(v.to_s)
+      nodes[v] = graph.add_node(v.to_s.gsub(',',''))
     end
     used = Set.new
     @edges.each do |e|
