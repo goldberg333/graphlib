@@ -19,7 +19,7 @@ class Vertex
   end
 
   def mult (vert2)
-    Vertex.new([@value,vert2.value].join(''))
+    Vertex.new([@value,vert2.value].join(','))
   end
 
   def to_s

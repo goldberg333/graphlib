@@ -16,6 +16,16 @@ class Edge
     (vert == @v1) || (vert == @v2)
   end
 
+  def change_direction
+    Edge.new(@v2,@v1)
+  end
+
+  def change_direction!
+    tmp = @v1
+    @v1 = @v2
+    @v2 = tmp
+  end
+
   def other_side(vert)
     if vert == @v1
       @v2

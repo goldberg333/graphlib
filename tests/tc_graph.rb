@@ -134,4 +134,41 @@ class TestGraph < Test::Unit::TestCase
     assert_equal(degr + 1, graph.degree(@a),"Degree should have been incremented!")
   end
 
+  def test_has_edge(directed)
+    edge = Edge.new(@a,@b)
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([edge]),directed)
+    test_edge = Edge.new(@a,@c)
+    assert(graph.has_edge?(edge),"Must contain edge!")
+    assert !graph.has_edge?(edge.change_direction) if directed
+    assert graph.has_edge?(edge.change_direction) unless directed
+    assert !graph.has_edge?(test_edge)
+    graph.add_edge_to_adj_list(test_edge)
+    assert graph.has_edge?(test_edge)
+  end
+
+  def test_has_edge_dir_graph
+    test_has_edge(true)
+  end
+
+  def test_has_edge_undir_graph
+    test_has_edge(false)
+  end
+
+  def test_cartesian_product
+    v0 = Vertex.new('0')
+    v1 = Vertex.new('1')
+    v2 = Vertex.new('2')
+    v3 = Vertex.new('3')
+    e01 = Edge.new(v0,v1)
+    e02 = Edge.new(v0,v2)
+    e12 = Edge.new(v1,v2)
+    e13 = Edge.new(v1,v3)
+    e23 = Edge.new(v2,v3)
+    graph1 = Graph.new(Set.new([v0,v1,v2,v3]),Set.new([e01,e02,e12,e13,e23]))
+    graph2 = Graph.new(Set.new([v0,v1]),Set.new([e01]))
+    res = graph1.cartesian_product(graph2)
+    assert_equal(graph1.adj_list.keys.size * graph2.adj_list.keys.size, res.adj_list.keys.size, "Wrong number of vertices!")
+    assert_equal(29,res.vertices.inject(0) {|sum,val| sum += res.degree(val)}, "Wrong total degree!")
+  end
+
 end

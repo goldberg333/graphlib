@@ -8,6 +8,7 @@ require 'graphviz'
 
 class Graph
   attr_accessor :vertices, :edges, :adj_list, :vlabels, :directed
+
   #Create new [un]directed graph using given vertices and edges between them
   def initialize(v, g, directed = false)
     @vertices, @edges, @adj_list, @verticeslabels, @directed = v.to_set, g.to_set, {}, {}, directed
@@ -91,34 +92,29 @@ class Graph
 
   #Returns cartesian product of this and given graphs
   def cartesian_product(graph)
-    verts = []
-    edges = []
+    res = Graph.new(Set.new,Set.new)
     @vertices.each do |u|
       graph.vertices.each do |v|
-        verts << [u,v]
+        res.add_vertex_to_adj_list(u.mult(v))
       end
     end
 
-    verts.each do |elem|
-      verts.each do |elem2|
-        edge1 = Edge.new(elem[0],elem2[0])
-        edge2 = Edge.new(elem[1],elem2[1])
-        edges << [elem,elem2] if (@edges.include?(edge1) && elem[1] == elem2[1]) || (@edges.include?(edge2) && elem[0] == elem2[0])
+    res.vertices.each do |v1|
+      res.vertices.each do |v2|
+        u,v = v1.value.split(',').map{|obj| Vertex.new(obj)}
+        ua,va = v2.value.split(',').map{|obj| Vertex.new(obj)}
+        edge1 = Edge.new(u,ua)
+        edge2 = Edge.new(v,va)
+        res.add_edge_to_adj_list(Edge.new(v1,v2)) if (has_edge?(edge1) && (v == va)) || (graph.has_edge?(edge2) && (u == ua))
       end
     end
-
-    grVerts = verts.map {|v| v.inject {|rv,v| rv.mult v}}
-    grEdges = []
-    edges.each do |edge|
-      e1,e2 = edge
-      v1 = e1[0].mult(e1[1])
-      v2 = e2[0].mult(e1[1])
-      grEdges << Edge.new(v1,v2)
-    end
-
-    Graph.new(grVerts,grEdges)
+    return res
   end
     
+  def has_edge?(edge)
+    @adj_list[edge.v1].include?(edge.v2)
+  end
+
   def to_s
     "V = {#{@vertices.join(', ')}} G = {#{@edges.join(', ')}}"
   end
