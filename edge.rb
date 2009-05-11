@@ -8,6 +8,14 @@ class Edge
     @v1 == other.v1 && @v2 == other.v2
   end
 
+  def eql? (other)
+    @v1 == other.v1 && @v2 == other.v2
+  end
+
+  def hash
+    @v1.hash + @v2.hash
+  end
+
   def to_s
     "(#{@v1}, #{@v2})"
   end

@@ -78,6 +78,8 @@ class Graph
 
   #Add edge to adjacency list
   def add_edge_to_adj_list(edge)
+    @edges << edge
+    @edges << edge.change_direction unless directed
     @adj_list[edge.v1] << edge.v2 if @adj_list[edge.v1]
     @adj_list[edge.v1] = Set.new [edge.v2] unless @adj_list[edge.v1]
     unless directed
@@ -113,7 +115,10 @@ class Graph
   end
     
   def has_edge?(edge)
-    @adj_list[edge.v1].include?(edge.v2)
+    has1 = @adj_list[edge.v1].include?(edge.v2)
+    has2 = false
+    has2 = @adj_list[edge.v2].include?(edge.v1) unless directed
+    has1 || has2
   end
 
   def to_s
@@ -121,14 +126,17 @@ class Graph
   end
   
   #Render current graph into file using given format (uses graphviz lib)
-  def render_to(params = {:format => 'png', :file => "graph.#{params[:format]}"})
-    graph = GraphViz.new('somegraph', :output => params[:format], :file => params[:file], :type => 'graph')
-    hash = {}
+  def render_to(params = {})
+    params[:format] ||= 'png'
+    params[:file] ||= "graph.#{params[:format]}"
+    graph = GraphViz.new('somegraph', :output => params[:format], :file => params[:file], :type => directed ? 'digraph' : 'graph')
+    nodes = {}
+    edges = [] unless directed
     @vertices.each do |v|
-      hash[v] = graph.add_node(v.to_s)
+      nodes[v] = graph.add_node(v.to_s)
     end
     @edges.each do |e|
-      graph.add_edge_to_adj_list(hash[e.v1],hash[e.v2])
+      edge = graph.add_edge(nodes[e.v1],nodes[e.v2])
     end
     graph.output
   end
