@@ -137,8 +137,12 @@ class Graph
     used = Set.new
     @edges.each do |e|
       edge = Edge.new(e.v1,e.v2)
-      graph.add_edge(nodes[e.v1],nodes[e.v2]) unless used.include?(edge.change_direction)
-      used << edge
+      unless directed
+        graph.add_edge(nodes[e.v1],nodes[e.v2]) unless used.include?(edge.change_direction)
+        used << edge
+      else
+        graph.add_edge(nodes[e.v1],nodes[e.v2])
+      end
     end
     graph.output
   end
