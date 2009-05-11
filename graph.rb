@@ -131,12 +131,14 @@ class Graph
     params[:file] ||= "graph.#{params[:format]}"
     graph = GraphViz.new('somegraph', :output => params[:format], :file => params[:file], :type => directed ? 'digraph' : 'graph')
     nodes = {}
-    edges = [] unless directed
     @vertices.each do |v|
       nodes[v] = graph.add_node(v.to_s)
     end
+    used = Set.new
     @edges.each do |e|
-      edge = graph.add_edge(nodes[e.v1],nodes[e.v2])
+      edge = Edge.new(e.v1,e.v2)
+      graph.add_edge(nodes[e.v1],nodes[e.v2]) unless used.include?(edge.change_direction)
+      used << edge
     end
     graph.output
   end
