@@ -1,7 +1,7 @@
 class Edge
   attr_accessor :v1, :v2, :weight
-  def initialize(v1 = nil, v2 = nil)
-    @v1, @v2 = v1, v2
+  def initialize(v1 = nil, v2 = nil, weight = 1)
+    @v1, @v2, @weight = v1, v2, weight
   end
 
   def == (other)

@@ -69,17 +69,23 @@ class Graph
   end
 
   #Check wheather graph contains cycles
-  def contain_cycle(vertex)
+  def contains_cycle?
     @marking = Hash.new
-    if @marking[x] == 'in Bearbeitung'
+    first = @vertices.sort.first
+    contains_cycle_sub(first)
+  end
+
+  def contains_cycle_sub(vertex)
+    if @marking[vertex] == 1
       return true
-    elsif @marking[x] == 'noch nicht begonnen'
-      @marking[x] = 'in Bearbeitung'
-      for n in @adj_list[x] do
-        contain_cycle(n)
+    elsif @marking[vertex] == nil
+      @marking[vertex] = 1
+      @adj_list[vertex].each do |n|
+        return contains_cycle_sub(n)
       end
-      @marking[x] = 'abgeschlossen'
+      @marking[vertex] = 2
     end
+    return false
   end
 
   #Add vertex to adjacency list
