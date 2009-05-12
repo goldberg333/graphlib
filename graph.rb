@@ -26,34 +26,39 @@ class Graph
     @adj_list.keys.inject("") {|sum,v| sum += "#{v}: {#{@adj_list[v].to_a.join(',') if @adj_list[v]}}\n"}
   end  
 
-  #Breadth First Search subroutine
-  def bfs_sub(to_vis,visited)
-    #If there is no vertex to visit then we're done
+  #Search subroutine
+  def search_sub(to_vis, visited, params)
     return visited if to_vis.empty?
-    #get next vertex to visit
-    vis = to_vis.deq
-    #if next vertex to visit is already visited then we can just skip it      
+    vis = to_vis.deq if params[:type] == "bfs"
+    vis = to_vis.pop if params[:type] == "dfs"
     if visited.include?(vis)
-      bfs_sub(to_vis,visited)
+      search_sub(to_vis,visited,params)
     else
-      #add all neighbours to vertices to visit
-      @adj_list[vis].map {|vertex| to_vis.enq(vertex)}
-      #add currect vertex to visit to visited vertices list
+      @adj_list[vis].map {|vertex| to_vis.enq(vertex)} if params[:type] == "bfs"
+      @adj_list[vis].map {|vertex| to_vis.push(vertex)} if params[:type] == "dfs"
       visited << vis
-      bfs_sub(to_vis,visited)
+      search_sub(to_vis,visited,params)
     end
   end
 
+  #Search or traversal function
+  def search(params)
+    to_vis = Queue.new if params[:type] == "bfs"
+    to_vis = [] if params[:type] == "dfs"
+    first = @vertices.sort.first
+    to_vis << first
+    search_sub(to_vis,[],params)
+  end
+      
+
   #Breadth First Search procedure
   def bfs
-    #Queue for visited vertices
-    to_vis = Queue.new
-    #Select the 'first' vertex
-    first = @vertices.sort.first
-    #Put it into queue for visited vertices
-    to_vis.enq(first)
-    #Run the subroutine
-    bfs_sub(to_vis,[])
+    search(:type => "bfs")
+  end
+
+  #Deapth First Search procedure
+  def dfs
+    search(:type => "dfs")
   end
 
   #Check wheather graph contains cycles
