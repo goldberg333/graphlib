@@ -61,6 +61,11 @@ class Graph
     search(:type => "dfs")
   end
 
+  #Check weather graph is connected
+  def connected?
+    bfs.size == @vertices.size
+  end
+
   #Check wheather graph contains cycles
   def contain_cycle(vertex)
     @marking = Hash.new
