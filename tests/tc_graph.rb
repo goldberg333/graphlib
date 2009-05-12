@@ -199,7 +199,7 @@ class TestGraph < Test::Unit::TestCase
   end
 
   def test_connected
-    graph = Graph.new(Set.new([@a,@b,@c]),Set.new)
+    graph = Graph.new([@a,@b,@c],[])
     assert(!graph.connected?,"Graph shouldn't be connected yet")
     graph.add_edge(@ab)
     assert(!graph.connected?,"Graph still shouldn't be connected yet")
@@ -207,4 +207,20 @@ class TestGraph < Test::Unit::TestCase
     assert(graph.connected?,"Graph must be connected!")
   end
 
+  def test_contains_cycle?(directed)
+    graph = Graph.new([@a,@b,@c,@d],[],directed)
+    assert(!graph.contains_cycle?,"Empty graph doesn't have cycles")
+    graph.add_edge(@ab)
+    assert(!graph.contains_cycle?,"No cycle yet")
+    graph.add_edge(@ac)
+    graph.add_edge(@bd)
+    assert(!graph.contains_cycle?,"No cycle yet2")
+    graph.add_edge(@dc)
+    graph.add_edge(@cb)
+    assert(graph.contains_cycle?,"Contains cycle!")
+  end
+
+  def test_contains_cycle?_directed_graph
+    test_contains_cycle?(true)
+  end
 end
