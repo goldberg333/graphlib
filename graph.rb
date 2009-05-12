@@ -10,15 +10,17 @@ class Graph
   attr_accessor :vertices, :edges, :adj_list, :vlabels, :directed
 
   #Create new [un]directed graph using given vertices and edges between them
-  def initialize(v, g, directed = false)
-    @vertices, @edges, @adj_list, @verticeslabels, @directed = v.to_set, g.to_set, {}, {}, directed
+  def initialize(vertices, edges, directed = false)
+    @adj_list, @verticeslabels, @directed = {}, {}, directed
+    @vertices = vertices.is_a?(Set) ? vertices : vertices.to_set
+    @edges = edges.is_a?(Set) ? edges : edges.to_set
     convert_to_adj_list
   end
 
   #Convert all vertices and edges into adjacency list
   def convert_to_adj_list
-    @edges.map {|edge| add_edge_to_adj_list(edge)}
-    @vertices.map {|vertex| add_vertex_to_adj_list(vertex)}
+    @edges.map {|edge| add_edge(edge)}
+    @vertices.map {|vertex| add_vertex(vertex)}
   end
 
   #Show graph in adjacency list form
@@ -81,18 +83,40 @@ class Graph
   end
 
   #Add vertex to adjacency list
-  def add_vertex_to_adj_list(vertex)
+  def add_vertex(vertex)
     @vertices << vertex
     @adj_list[vertex] = Set.new unless @adj_list[vertex]
   end
 
+  #Remove vertex from graph
+  def remove_vertex(vertex)
+    @vertices.delete(vertex)
+    @adj_list[vertex].each do |v|
+      remove_edge(Edge.new(vertex,v))
+    end
+    @vertices.each do |v|
+      remove_edge(Edge.new(v,vertex)) if @adj_list[v].include?(vertex)
+    end
+    @adj_list.delete(vertex)
+  end
+
+  #Remove edge from graph
+  def remove_edge(edge)
+    @edges.delete(edge)
+    @adj_list[edge.v1].delete(edge.v2)
+    unless @directed
+      @adj_list[edge.v2].delete(edge.v1)
+      @edges.delete(edge.change_direction)
+    end
+  end
+
   #Add edge to adjacency list
-  def add_edge_to_adj_list(edge)
+  def add_edge(edge)
     @edges << edge
-    @edges << edge.change_direction unless directed
+    @edges << edge.change_direction unless @directed
     @adj_list[edge.v1] << edge.v2 if @adj_list[edge.v1]
     @adj_list[edge.v1] = Set.new [edge.v2] unless @adj_list[edge.v1]
-    unless directed
+    unless @directed
       @adj_list[edge.v2] << edge.v1 if @adj_list[edge.v2]
       @adj_list[edge.v2] = Set.new [edge.v1] unless @adj_list[edge.v2]
     end
@@ -108,7 +132,7 @@ class Graph
     res = Graph.new(Set.new,Set.new)
     @vertices.each do |u|
       graph.vertices.each do |v|
-        res.add_vertex_to_adj_list(u.mult(v))
+        res.add_vertex(u.mult(v))
       end
     end
 
@@ -118,7 +142,7 @@ class Graph
         ua,va = v2.value.split(',').map{|obj| Vertex.new(obj)}
         edge1 = Edge.new(u,ua)
         edge2 = Edge.new(v,va)
-        res.add_edge_to_adj_list(Edge.new(v1,v2)) if (has_edge?(edge1) && (v == va)) || (graph.has_edge?(edge2) && (u == ua))
+        res.add_edge(Edge.new(v1,v2)) if (has_edge?(edge1) && (v == va)) || (graph.has_edge?(edge2) && (u == ua))
       end
     end
     return res

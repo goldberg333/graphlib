@@ -19,12 +19,12 @@ class TestGraph < Test::Unit::TestCase
 
   end
 
-  def test_add_vertex_to_adj_list(directed,vertex,existent)
+  def test_add_vertex(directed,vertex,existent)
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab,@bc]),directed)
     vertices_cnt = graph.adj_list.keys.size
     neighbours_cnt = graph.adj_list[vertex].size if existent
     assert_nil(graph.adj_list[vertex]) unless existent
-    graph.add_vertex_to_adj_list(vertex)
+    graph.add_vertex(vertex)
     if existent
       assert_equal(vertices_cnt, graph.adj_list.keys.size, "Wrong number of vertices in ajacency list!")
       assert_equal(neighbours_cnt, graph.adj_list[vertex].size, "Wrong number of neighbours in adjacency list!")
@@ -33,25 +33,42 @@ class TestGraph < Test::Unit::TestCase
     end
   end
 
-  def test_add_vertex_to_adj_list_undir_graph_existent_vertex
-    test_add_vertex_to_adj_list(false,@a,true)
+  def test_add_vertex_undir_graph_existent_vertex
+    test_add_vertex(false,@a,true)
   end
 
-  def test_add_vertex_to_adj_list_dir_graph_existent_vertex
-    test_add_vertex_to_adj_list(true,@a,true)
+  def test_add_vertex_dir_graph_existent_vertex
+    test_add_vertex(true,@a,true)
   end
   
-  def test_add_vertex_to_adj_list_undir_graph_nonexistent_vertex
+  def test_add_vertex_undir_graph_nonexistent_vertex
     z = Vertex.new('z')
-    test_add_vertex_to_adj_list(false,z,false)
+    test_add_vertex(false,z,false)
   end
 
-  def test_add_vertex_to_adj_list_dir_graph_nonexistent_vertex
+  def test_add_vertex_dir_graph_nonexistent_vertex
     z = Vertex.new('z')
-    test_add_vertex_to_adj_list(true,z,false)
+    test_add_vertex(true,z,false)
   end
 
-  def test_add_edge_to_adj_list(directed,existent)
+  def test_remove_vertex(directed)
+    graph = Graph.new([@a,@b,@c,@d],[@ad,@db,@cd,@bc],directed)
+    vertices_cnt = graph.vertices.size
+    edges_cnt = graph.edges.size
+    graph.remove_vertex(@d)
+    assert_equal(vertices_cnt - 1, graph.vertices.size, "Vertex wasn't removed correctly!")
+    assert_equal(directed ? 1 : 2, graph.edges.size,"Edges containing vertex weren't removed correctly!")
+  end
+
+  def test_remove_vertex_directed_graph
+    test_remove_vertex(true)
+  end
+
+  def test_remove_vertex_undirected_graph
+    test_remove_vertex(false)
+  end
+
+  def test_add_edge(directed,existent)
     if existent
       edge = @ab
     else
@@ -60,7 +77,7 @@ class TestGraph < Test::Unit::TestCase
     graph = Graph.new(Set.new([@a,@b,@c,@d]),Set.new([@ab]),directed)
     v1_neighbours_cnt = graph.adj_list[edge.v1].size
     v2_neighbours_cnt = graph.adj_list[edge.v2].size
-    graph.add_edge_to_adj_list(edge)
+    graph.add_edge(edge)
     if existent
       assert_equal(v1_neighbours_cnt, graph.adj_list[edge.v1].size,"Neighbours count for the first vertex shouldn't have changed")
       assert_equal(v2_neighbours_cnt, graph.adj_list[edge.v2].size,"Neighbours count for the second vertex shouldn't have changed")
@@ -76,20 +93,37 @@ class TestGraph < Test::Unit::TestCase
     end
   end
 
-  def test_add_edge_to_adj_list_dir_graph_nonexistent_edge
-    test_add_edge_to_adj_list(true,false)
+  def test_add_edge_dir_graph_nonexistent_edge
+    test_add_edge(true,false)
   end
 
-  def test_add_edge_to_adj_list_undir_graph_nonexistent_edge
-    test_add_edge_to_adj_list(false,false)
+  def test_add_edge_undir_graph_nonexistent_edge
+    test_add_edge(false,false)
   end
 
-  def test_add_edge_to_adj_list_dir_graph_existent_edge
-    test_add_edge_to_adj_list(true,true)
+  def test_add_edge_dir_graph_existent_edge
+    test_add_edge(true,true)
   end
 
-  def test_add_edge_to_adj_list_undir_graph_existent_edge
-    test_add_edge_to_adj_list(false,true)
+  def test_add_edge_undir_graph_existent_edge
+    test_add_edge(false,true)
+  end
+
+  def test_remove_edge(directed)
+    graph = Graph.new([@a,@b,@c,@d],[@ab,@bc,@ad],directed)
+    edges_cnt = graph.edges.size
+    graph.remove_edge(@ab)
+    assert_equal(edges_cnt - (directed ? 1 : 2), graph.edges.size, "Edge wasn't remove correctly!")
+    graph.remove_edge(@ab)
+    assert_equal(edges_cnt - (directed ? 1 : 2), graph.edges.size, "Edge was already removed!")
+  end
+
+  def test_remove_edge_directed_graph
+    test_remove_edge(true)
+  end
+
+  def test_remove_edge_undirected_graph
+    test_remove_edge(false)
   end
 
   def test_convert_to_adjacency_list_for_directed_graph
@@ -121,9 +155,9 @@ class TestGraph < Test::Unit::TestCase
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]))
     degr = graph.degree(@a)
     assert_equal(1, degr, "Degree must be equal to 1")
-    graph.add_edge_to_adj_list(Edge.new(@a,@b))
+    graph.add_edge(Edge.new(@a,@b))
     assert_equal(degr, graph.degree(@a), "Degree shouldn't have been changed!")
-    graph.add_edge_to_adj_list(Edge.new(@a,@c))
+    graph.add_edge(Edge.new(@a,@c))
     assert_equal(degr + 1, graph.degree(@a),"Degree should have been incremented!")
   end
 
@@ -135,7 +169,7 @@ class TestGraph < Test::Unit::TestCase
     assert !graph.has_edge?(edge.change_direction) if directed
     assert graph.has_edge?(edge.change_direction) unless directed
     assert !graph.has_edge?(test_edge)
-    graph.add_edge_to_adj_list(test_edge)
+    graph.add_edge(test_edge)
     assert graph.has_edge?(test_edge)
   end
 
@@ -167,9 +201,9 @@ class TestGraph < Test::Unit::TestCase
   def test_connected
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new)
     assert(!graph.connected?,"Graph shouldn't be connected yet")
-    graph.add_edge_to_adj_list(@ab)
+    graph.add_edge(@ab)
     assert(!graph.connected?,"Graph still shouldn't be connected yet")
-    graph.add_edge_to_adj_list(@ac)
+    graph.add_edge(@ac)
     assert(graph.connected?,"Graph must be connected!")
   end
 
