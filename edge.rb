@@ -1,5 +1,5 @@
 class Edge
-  attr_accessor :v1, :v2
+  attr_accessor :v1, :v2, :weight
   def initialize(v1 = nil, v2 = nil)
     @v1, @v2 = v1, v2
   end

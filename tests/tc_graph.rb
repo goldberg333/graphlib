@@ -3,23 +3,16 @@ require 'test/unit'
 
 class TestGraph < Test::Unit::TestCase
   def setup
-    @a = Vertex.new('a')
-    @b = Vertex.new('b')
-    @c = Vertex.new('c')
-    @d = Vertex.new('d')
-    @e = Vertex.new('e')
-    @f = Vertex.new('f')
-    @g = Vertex.new('g')
-    @h = Vertex.new('h')
-    @e1 = Edge.new(@a,@b)
-    @e2 = Edge.new(@a,@d)
-    @e3 = Edge.new(@a,@h)
-    @e4 = Edge.new(@b,@c)
-    @e5 = Edge.new(@b,@e)
-    @e6 = Edge.new(@h,@g)
-    @e7 = Edge.new(@g,@f)
-    @graph = Graph.new(Set.new([@a,@b,@c,@d,@e,@f,@g,@h]),Set.new([@e1,@e2,@e3,@e4,@e5,@e6,@e7]))
-    @graph_dir = Graph.new(Set.new([@a,@b,@c,@d,@e,@f,@g,@h]),Set.new([@e1,@e2,@e3,@e4,@e5,@e6,@e7]),true)
+    ('a'..'h').each do |v|
+      instance_variable_set(:"@#{v}",Vertex.new(v))
+    end
+    ('a'..'h').each do |v1|
+      ('a'..'h').each do |v2|
+        instance_variable_set(:"@#{v1 + v2}",Edge.new(instance_variable_get(:"@#{v1}"),instance_variable_get(:"@#{v2}")))
+      end
+    end
+    @graph = Graph.new(Set.new([@a,@b,@c,@d,@e,@f,@g,@h]),Set.new([@ab,@ad,@ah,@bc,@be,@hg,@gf]))
+    @graph_dir = Graph.new(Set.new([@a,@b,@c,@d,@e,@f,@g,@h]),Set.new([@ab,@ad,@ah,@bc,@be,@hg,@gf]),true)
   end
 
   def teardown
@@ -27,7 +20,7 @@ class TestGraph < Test::Unit::TestCase
   end
 
   def test_add_vertex_to_adj_list(directed,vertex,existent)
-    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@e1,@e4]),directed)
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab,@bc]),directed)
     vertices_cnt = graph.adj_list.keys.size
     neighbours_cnt = graph.adj_list[vertex].size if existent
     assert_nil(graph.adj_list[vertex]) unless existent
@@ -60,11 +53,11 @@ class TestGraph < Test::Unit::TestCase
 
   def test_add_edge_to_adj_list(directed,existent)
     if existent
-      edge = Edge.new(@a,@b)
+      edge = @ab
     else
-      edge = Edge.new(@c,@d)
+      edge = @cd
     end
-    graph = Graph.new(Set.new([@a,@b,@c,@d]),Set.new([@e1]),directed)
+    graph = Graph.new(Set.new([@a,@b,@c,@d]),Set.new([@ab]),directed)
     v1_neighbours_cnt = graph.adj_list[edge.v1].size
     v2_neighbours_cnt = graph.adj_list[edge.v2].size
     graph.add_edge_to_adj_list(edge)
@@ -125,7 +118,7 @@ class TestGraph < Test::Unit::TestCase
   end
 
   def test_degree
-    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@e1]))
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]))
     degr = graph.degree(@a)
     assert_equal(1, degr, "Degree must be equal to 1")
     graph.add_edge_to_adj_list(Edge.new(@a,@b))
@@ -135,9 +128,9 @@ class TestGraph < Test::Unit::TestCase
   end
 
   def test_has_edge(directed)
-    edge = Edge.new(@a,@b)
-    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([edge]),directed)
-    test_edge = Edge.new(@a,@c)
+    edge = @ab
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]),directed)
+    test_edge = @ac
     assert(graph.has_edge?(edge),"Must contain edge!")
     assert !graph.has_edge?(edge.change_direction) if directed
     assert graph.has_edge?(edge.change_direction) unless directed
@@ -169,6 +162,15 @@ class TestGraph < Test::Unit::TestCase
     res = graph1.cartesian_product(graph2)
     assert_equal(graph1.adj_list.keys.size * graph2.adj_list.keys.size, res.adj_list.keys.size, "Wrong number of vertices!")
     assert_equal(28,res.vertices.inject(0) {|sum,val| sum += res.degree(val)}, "Wrong total degree!")
+  end
+
+  def test_connected
+    graph = Graph.new(Set.new([@a,@b,@c]),Set.new)
+    assert(!graph.connected?,"Graph shouldn't be connected yet")
+    graph.add_edge_to_adj_list(@ab)
+    assert(!graph.connected?,"Graph still shouldn't be connected yet")
+    graph.add_edge_to_adj_list(@ac)
+    assert(graph.connected?,"Graph must be connected!")
   end
 
 end
