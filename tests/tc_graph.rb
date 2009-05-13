@@ -161,6 +161,8 @@ class TestGraph < Test::Unit::TestCase
     assert_equal(degr + 1, graph.degree(@a),"Degree should have been incremented!")
     total_degree = graph.vertices.inject(0) {|sum,vertex| sum += graph.degree(vertex)}
     assert_equal(graph.edges.size, total_degree, "Total degree must be equal to double edges count!")
+    total_odd_degree = graph.vertices.inject(0) {|sum,vertex| sum += ((graph.degree(vertex) % 2) == 0) ? 0 : 1 }
+    assert(total_odd_degree % 2 == 0,"Total degree of odd degrees must be even!")
   end
 
   def test_has_edge(directed)
