@@ -223,4 +223,14 @@ class TestGraph < Test::Unit::TestCase
   def test_contains_cycle?_directed_graph
     test_contains_cycle?(true)
   end
+
+  def test_regular?
+    graph = Graph.new([@a,@b,@c],[])
+    assert(graph.regular?,"Should be regular since all vertices has degree 0!")
+    graph.add_edge(@ab)
+    assert(!graph.regular?,"Now two vertices have different degree!")
+    graph.add_edge(@ac)
+    graph.add_edge(@bc)
+    assert(graph.regular?,"All vertices have degree 4")
+  end
 end

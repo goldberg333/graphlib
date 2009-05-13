@@ -133,6 +133,14 @@ class Graph
     @adj_list[vertex].size
   end
 
+  #Checks wheather graph is regular
+  def regular?
+    degree = degree(@vertices.first)
+    @vertices.each do |vertex|
+      return false if degree != degree(vertex)
+    end
+  end
+
   #Returns cartesian product of this and given graphs
   def cartesian_product(graph)
     res = Graph.new(Set.new,Set.new)
