@@ -233,4 +233,14 @@ class TestGraph < Test::Unit::TestCase
     graph.add_edge(@bc)
     assert(graph.regular?,"All vertices have degree 4")
   end
+
+  def test_k_regular
+    graph = Graph.new([@a,@b,@c],[])
+    assert_equal(0,graph.k_regular,"All vertices has degree 0!")
+    graph.add_edge(@ab)
+    assert(!graph.k_regular,"Graph isn't regular!")
+    graph.add_edge(@ac)
+    graph.add_edge(@bc)
+    assert_equal(2,graph.k_regular,"All vertices have degree 2")
+  end
 end

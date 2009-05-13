@@ -141,6 +141,15 @@ class Graph
     end
   end
 
+  #Returns the degree of all vertices if graph is regular and nil in other case
+  def k_regular
+    degree = degree(@vertices.first)
+    @vertices.each do |vertex|
+      return nil if degree != degree(vertex)
+    end
+    return degree
+  end
+
   #Returns cartesian product of this and given graphs
   def cartesian_product(graph)
     res = Graph.new(Set.new,Set.new)
