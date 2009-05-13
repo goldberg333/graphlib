@@ -165,6 +165,54 @@ class TestGraph < Test::Unit::TestCase
     assert(total_odd_degree % 2 == 0,"Total degree of odd degrees must be even!")
   end
 
+  def test_in_degree(directed)
+    graph = Graph.new([@a,@b,@c],[@ab],directed)
+    assert_equal(0, graph.in_degree(@c),"No vertex leads to b!")
+    unless directed
+      assert_equal(1, graph.in_degree(@a), "b leads to a!")
+    else
+      assert_equal(0, graph.in_degree(@a), "No vertex leads to a!")
+    end
+    graph.add_edge(@ab)
+    assert_equal(1, graph.in_degree(@b), "b leads to a!")
+    graph.add_edge(@ac)
+    assert_equal(1, graph.in_degree(@c),"a leads to c!")
+  end
+
+  def test_in_degree_directed_graph
+    test_in_degree(true)
+  end
+
+  def test_in_degree_undirected_graph
+    test_in_degree(false)
+  end
+
+  def test_out_degree(directed)
+    graph = Graph.new([@a,@b,@c],[@ab],directed)
+    assert_equal(0, graph.out_degree(@c),"No edge from c!")
+    assert_equal(1, graph.out_degree(@a), "There is 1 edge from a!")
+    graph.add_edge(@ab)
+    unless directed
+      assert_equal(1, graph.out_degree(@b), "b leads to a!")
+    else
+      assert_equal(0,graph.out_degree(@b),"No edges from b!")
+    end
+    graph.add_edge(@ac)
+    unless directed
+      assert_equal(1, graph.out_degree(@c),"a leads to c!")
+    else
+      assert_equal(0,graph.out_degree(@c),"No edges from c!")
+    end
+  end
+
+  def test_out_degree_directed_graph
+    test_out_degree(true)
+  end
+
+  def test_out_degreee_undirected_graph
+    test_out_degree(false)
+  end
+  
   def test_has_edge(directed)
     edge = @ab
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]),directed)

@@ -128,9 +128,20 @@ class Graph
     end
   end
 
+  #Total count of adjacent vertices which lead to given vertex
+  def in_degree(vertex)
+    @vertices.inject(0) {|sum,v| sum += @adj_list[v].include?(vertex) ? 1 : 0 }
+  end
+
+  #Total count of adjacent vertices which to which given vertex leads
+  def out_degree(vertex)
+    @adj_list[vertex].size
+  end
+
   #Returns the degree of the given vertex for undirected graph
   def degree(vertex)
-    @adj_list[vertex].size
+    in_degree(vertex) + out_degree(vertex) if directed
+    (in_degree(vertex) + out_degree(vertex)) / 2
   end
 
   #Checks wheather graph is regular
