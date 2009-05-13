@@ -155,10 +155,12 @@ class TestGraph < Test::Unit::TestCase
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]))
     degr = graph.degree(@a)
     assert_equal(1, degr, "Degree must be equal to 1")
-    graph.add_edge(Edge.new(@a,@b))
+    graph.add_edge(@ab)
     assert_equal(degr, graph.degree(@a), "Degree shouldn't have been changed!")
-    graph.add_edge(Edge.new(@a,@c))
+    graph.add_edge(@ac)
     assert_equal(degr + 1, graph.degree(@a),"Degree should have been incremented!")
+    total_degree = graph.vertices.inject(0) {|sum,vertex| sum += graph.degree(vertex)}
+    assert_equal(graph.edges.size, total_degree, "Total degree must be equal to double edges count!")
   end
 
   def test_has_edge(directed)
