@@ -151,7 +151,7 @@ class TestGraph < Test::Unit::TestCase
     assert_equal(test, @graph.adj_list, "Adjacency list ins't correct for undirected graph!")
   end
 
-  def test_degree
+  def test_degree(directed)
     graph = Graph.new(Set.new([@a,@b,@c]),Set.new([@ab]))
     degr = graph.degree(@a)
     assert_equal(1, degr, "Degree must be equal to 1")
@@ -163,6 +163,21 @@ class TestGraph < Test::Unit::TestCase
     assert_equal(graph.edges.size, total_degree, "Total degree must be equal to double edges count!")
     total_odd_degree = graph.vertices.inject(0) {|sum,vertex| sum += ((graph.degree(vertex) % 2) == 0) ? 0 : 1 }
     assert(total_odd_degree % 2 == 0,"Total degree of odd degrees must be even!")
+    if directed
+      total_out_degree = graph.vertices.inject(0) {|sum,v| sum += graph.out_degree(v)}
+      total_in_degree = graph.vertices.inject(0) {|sum,v| sum += graph.in_degree(v)}
+      total_edges = graph.edges.size
+      assert_equal(total_edges,total_out_degree,"In finite directed graph total_in_degree must be equal to total edges count!")
+      assert_equal(total_edges,total_in_degree,"In finite directed graph total_out_degree must be equal to total edges count!")
+    end
+  end
+
+  def test_degree_directed_graph
+    test_degree(true)
+  end
+  
+  def test_degree_undirected_graph
+    test_degree(false)
   end
 
   def test_in_degree(directed)
